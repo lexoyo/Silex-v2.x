@@ -15,7 +15,7 @@ import haxe.Timer;
 /**
  * This class is in charge of loading and storing the configuration data of the Silex server
  */
-class Interpreter{
+class InterpreterTools{
 	/**
 	 * Debug action executed at start
 	 */

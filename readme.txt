@@ -68,9 +68,13 @@ missing functionality
 - liste de pages réordonnable
 
 cleanup code
+- PublicationModel
 - Draggable::getBestDropZone
 - SelectionMarker::onDrag
 - DomTools::getElementBoundingBox
+  => use jquery ??
+- refactoring: mvc
+
 
 fonctionnalité
 - selection move
