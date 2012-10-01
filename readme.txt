@@ -32,19 +32,48 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 To read the license please visit http://www.gnu.org/copyleft/gpl.html
 
 
-** To do **
+-------------------
+En cours
+-------------------
 
+**refactoring**
+
+mise a jour version Cocktail => typedef audio et video => changer dans SLPLayer Layer
+contexts: generalize the toolbox contexts
+
+selection
+- ecoute window.resize, et dispatcher window.resize dans Page::open
+
+le builder qui ouvre une publication devrait se servir des fonctions de Silex.hx?
+pareil pour le côté server (remoting)?
+
+reunir template et interpreter dans un package ?
+
+permettre d'omettre le # dans les LinkToPage => navigation sans js (ajout .html aux liens?)
+
+* bugs
+  * fermeture de page ne tient pas compte des groupes enfants
+  * bugfix Lib.document.innerHTML call makes an error 500 on the server https://github.com/silexlabs/Cocktail/issues/217
+  * workaround, bug https://github.com/silexlabs/Cocktail/issues/207
+  * init the document with non empty body, workaround see  https://github.com/silexlabs/Cocktail/issues/208
+  * memory leak in the Layer and transition classes
+  * in the List class, listen to the click on the container instead of each cell, to prevent memory leak
+  * chrome and color picker : read ok, load bug
+
+** To do **
+a discuter avec thomas
+- mvc? 
+- drazg drop avec "proxy"
 
 StageDropHandler => DropHandlerBase
 SelectionMarker => SelectionDropHandler
-
 
 addAssociatedComponent etc dans les models
 dans index.html Group class au lieu des classes "résolues"
 
 remettre en place des tests unitaires
 - chaque liste
-
+- bouger les publications de test
 
 draggable list de page => réordonner dans le dom et view
 
@@ -100,6 +129,30 @@ design
 - style menu / ribbon
 - style des boites a outils
 - anims de transition show/hide sur selection, position des layers, des composants...
+
+improvements
+* ajout d'un éditeur de css et de hscript
+  - utilise http://ace.ajax.org/ ou http://neutronide.com/
+  - écrire à ace@c9.io pour apparaitre ici "projects using ace" http://ace.ajax.org/#nav=about
+* add the manager, not found etc. to distrib ?
+* transitions with params on the Layer as well as on the link
+* "loading" transitions for the layers with connectors
+* contexts with multiple class names ==== merge the concepts of Context and Page (=> State, State.setState(contextName, stateName))
+* rename
+  - Page into State
+  - Layer into Container
+* dans PublicationData, charger tous les .css? ou tout ce qui est dans style/?
+* mettre toute la conf dans les headers? Vu que seules les personnes autorisées vont voir la page...
+* components
+  * transition alpha
+* ?no conditional compilation in class Silex (client version)
+* 404 error publication
+* SLExtend 
+  * Init plugins in Silex::new
+  * split Silex::new into smaller methods
+* opa-like lib
+* in Silex.hx, add the style sheet in a style tag directly in the html page
+* builder classes should not be in silex.js
 
 
 
@@ -174,55 +227,3 @@ styles for a component
 * display, position, float, borders, background, margin...
 
 
-
--------------------
-En cours
--------------------
-
-**refactoring**
-
-mise a jour version Cocktail => typedef audio et video => changer dans SLPLayer Layer
-contexts: generalize the toolbox contexts
-
-selection
-- ecoute window.resize, et dispatcher window.resize dans Page::open
-
-le builder qui ouvre une publication devrait se servir des fonctions de Silex.hx?
-pareil pour le côté server (remoting)?
-
-reunir template et interpreter dans un package ?
-
-permettre d'omettre le # dans les LinkToPage => navigation sans js (ajout .html aux liens?)
-
-* bugs
-  * fermeture de page ne tient pas compte des groupes enfants
-  * bugfix Lib.document.innerHTML call makes an error 500 on the server https://github.com/silexlabs/Cocktail/issues/217
-  * workaround, bug https://github.com/silexlabs/Cocktail/issues/207
-  * init the document with non empty body, workaround see  https://github.com/silexlabs/Cocktail/issues/208
-  * memory leak in the Layer and transition classes
-  * in the List class, listen to the click on the container instead of each cell, to prevent memory leak
-  * chrome and color picker : read ok, load bug
-
-improvements
-* ajout d'un éditeur de css et de hscript
-  - utilise http://ace.ajax.org/ ou http://neutronide.com/
-  - écrire à ace@c9.io pour apparaitre ici "projects using ace" http://ace.ajax.org/#nav=about
-* add the manager, not found etc. to distrib ?
-* transitions with params on the Layer as well as on the link
-* "loading" transitions for the layers with connectors
-* contexts with multiple class names ==== merge the concepts of Context and Page (=> State, State.setState(contextName, stateName))
-* rename
-  - Page into State
-  - Layer into Container
-* dans PublicationData, charger tous les .css? ou tout ce qui est dans style/?
-* mettre toute la conf dans les headers? Vu que seules les personnes autorisées vont voir la page...
-* components
-  * transition alpha
-* ?no conditional compilation in class Silex (client version)
-* 404 error publication
-* SLExtend 
-  * Init plugins in Silex::new
-  * split Silex::new into smaller methods
-* opa-like lib
-* in Silex.hx, add the style sheet in a style tag directly in the html page
-* builder classes should not be in silex.js
