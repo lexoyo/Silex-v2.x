@@ -43,7 +43,7 @@ To read the license please visit http://www.gnu.org/copyleft/gpl.html
 * cleanup Silex.hx : package core et split selon les options de config
 
 remarques pol
-* selection du container quand on va droper dedans
+x * selection du container quand on va droper dedans
 * tool tip sur btn edit des container, videos
 * indiquer qu'il faut un oog et un mp3 pour ff et chrome?
 * insert : si pas de calque selectionné, alert

@@ -117,6 +117,13 @@ class ModelBase <FinalType>{
 		return item;
 	}
 	/**
+	 * Like the setter for the selected item, but do not dispatch event or take other actions than setting the item
+	 */
+	public function setSelectedItemNoEvent(item:FinalType):FinalType {
+		selectedItem = item;
+		return item;
+	}
+	/**
 	 * Refresh selection, this wil dispatch a change event but keep current selection
 	 */
 	public function refresh() {

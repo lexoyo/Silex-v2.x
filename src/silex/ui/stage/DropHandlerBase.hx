@@ -103,8 +103,9 @@ class DropHandlerBase extends DisplayObject{
 		{
 			var layerClasses = FileModel.getInstance().application.getAssociatedComponents(dropZone.parent, Layer);
 			if (layerClasses.length == 1){
-				// case of a component dropped in a layer
-				LayerModel.getInstance().selectedItem = layerClasses.first();
+				// case of a component dropped in a layer, prevent unselect component
+				LayerModel.getInstance().setSelectedItemNoEvent(layerClasses.first());
+				//LayerModel.getInstance().refresh();
 			}
 		}
 	}
