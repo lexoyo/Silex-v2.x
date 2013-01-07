@@ -38,12 +38,6 @@ To read the license please visit http://www.gnu.org/copyleft/gpl.html
 
 ** to do **
 
-en cours
-* new drag/drop system (brix)
-  - mouse down => parcours le dom avec le mini phantom, crée une liste de dropZone (parent, index, bounding box)
-  - mouse move => parcours la liste de dropZone et det la plus proche
-  - mouse up => détruit la liste
-
 * display none => no drop?
 * remplacer silex-view par silex-body
 * cleanup Silex.hx : package core et split selon les options de config

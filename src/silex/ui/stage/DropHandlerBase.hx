@@ -45,6 +45,7 @@ class DropHandlerBase extends DisplayObject{
 		initialMarkerPopsition = DomTools.getElementIndex(rootElement);
 		rootElement.addEventListener(Draggable.EVENT_DROPPED, onDrop, false);
 		rootElement.addEventListener(Draggable.EVENT_DRAG, onDrag, false);
+		rootElement.addEventListener(Draggable.EVENT_MOVE, onMove, false);
 	}
 	/**
 	 * init the component
@@ -88,6 +89,24 @@ class DropHandlerBase extends DisplayObject{
 			rootElement.appendChild(draggedElement);
 		}
 
+	}
+	/**
+	 * Handle Draggable events
+	 */
+	public function onMove(e:Event) {
+		var event:CustomEvent = cast(e);
+
+		// the drop zone passed with the event 
+		var dropZone:DropZone = event.detail.dropZone;
+		// update layer selection
+		if (dropZone != null)
+		{
+			var layerClasses = FileModel.getInstance().application.getAssociatedComponents(dropZone.parent, Layer);
+			if (layerClasses.length == 1){
+				// case of a component dropped in a layer
+				LayerModel.getInstance().selectedItem = layerClasses.first();
+			}
+		}
 	}
 	/**
 	 * Handle Draggable events
