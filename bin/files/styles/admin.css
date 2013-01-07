@@ -794,6 +794,18 @@ box-shadow: inset 0px 0px 2px 2px #888;
 .ribbon-list ul li.back-up-all{
 	background-image: url("../assets/admin/back-up-all.png");
 }
+.ribbon-list ul li.export-publication{
+	background-image: url("../assets/admin/export-publication.png");
+}
+.ribbon-list ul li.publish{
+	background-image: url("../assets/admin/publish.png");
+}
+.ribbon-list ul li.manage-files{
+	background-image: url("../assets/admin/manage-files.png");
+}
+.ribbon-list ul li.preview-publication{
+	background-image: url("../assets/admin/preview-publication.png");
+}
 
 
 /**
