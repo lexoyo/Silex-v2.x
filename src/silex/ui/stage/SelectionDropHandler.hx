@@ -299,14 +299,12 @@ class SelectionDropHandler extends DropHandlerBase{
 			// store the component and its parent and index
 			draggedComponent = ComponentModel.getInstance().selectedItem;
 			// change the style of the phantom to reflect the element style
-			//draggableEvent.draggable.initPhantomStyle(draggedComponent);
 		}
 		else if(LayerModel.getInstance().selectedItem != null){
 			// case of a layer
 			// store the component 
 			draggedLayer = LayerModel.getInstance().selectedItem;
 			// change the style of the phantom to reflect the element style
-			//draggableEvent.draggable.initPhantomStyle(draggedLayer.rootElement);
 		}
 	}
 	////////////////////////////////////////////////////////////////////////

@@ -67,8 +67,8 @@
 		
 		<script type="text/hscript">
 			//Lib.alert('test!');
-			//FileModel.getInstance().load('test.html');
-			MenuController.createFile();
+			FileModel.getInstance().load('my-new-silex-site.html');
+			//MenuController.createFile();
 		</script>
 	</head>
 	<body class="builder-view">
@@ -148,7 +148,7 @@
 							</LI>
 							<LI data-menu-item="settings" class="disabled-element settings" title="settings">
 							</LI>
-							<LI class="disabled-element" data-menu-item="backup-all" title="backup all">
+							<LI class="back-up-all disabled-element" data-menu-item="backup-all" title="backup all">
 							</LI>
 							<LI class="disabled-element" data-menu-item="export" title="export">
 							</LI>
@@ -345,10 +345,6 @@
 						<A class="Page" name="properties-tab">Properties</A>
 						<A href="#properties-tab" class="LinkToPage accordion-header">Properties</A>
 						<FORM class="Layer accordion-item properties-tab"
-							data-show-start-style="accordion-item-close"
-							data-show-end-style="accordion-item-open"
-							data-hide-start-style="accordion-item-open"
-							data-hide-end-style="accordion-item-close"
 						>
 							<FIELDSET class="PropertyEditor">
 								<LEGEND>Attributes</LEGEND>
@@ -456,10 +452,6 @@
 							<A class="Page"  name="::name::">::name::</A>
 	                        <A href="#::name::" class="LinkToPage accordion-header">::name::</A>
 	                        <FORM class="Layer accordion-item ::name::"
-								data-show-start-style="accordion-item-close"
-								data-show-end-style="accordion-item-open"
-								data-hide-start-style="accordion-item-open"
-								data-hide-end-style="accordion-item-close"
 	                        >
 		                       	::foreach groups::
 									<FIELDSET>

@@ -69,6 +69,7 @@ class DropHandlerBase extends DisplayObject{
 	 * Handle Draggable events
 	 */
 	public function onDrag(e:Event) {
+		trace("silex onDrag");
 		// check that we have finished dragging any other element
 		var event:CustomEvent = cast(e);
 		event.detail.draggable.groupElement = FileModel.getInstance().currentData.viewHtmlDom.parentNode;
@@ -80,7 +81,8 @@ class DropHandlerBase extends DisplayObject{
 			draggedElementParent = draggedElement.parentNode;
 			draggedElementPosition = DomTools.getElementIndex(draggedElement);
 			// change the phantom style
-			event.detail.draggable.initPhantomStyle(draggedElement);
+			var draggable:Draggable = event.detail.draggable;
+			draggable.initPhantomStyle(draggedElement);
 			// remove the element from stage
 			//draggedElement.parentNode.removeChild(draggedElement);
 			rootElement.appendChild(draggedElement);

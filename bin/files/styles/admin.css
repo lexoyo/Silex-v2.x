@@ -582,7 +582,7 @@ box-shadow: inset 0px 0px 2px 2px #888;
 .selection-marker-edit-image,
 .selection-marker-edit-media,
 .selection-marker-edit-layer {
-	background-image:url(../assets/admin/sv2-ico-edit.png);
+	background-image:url(../assets/admin/edit-selected-item.png);
 	right: 23px;
 }
 
@@ -791,6 +791,9 @@ box-shadow: inset 0px 0px 2px 2px #888;
 .ribbon-list ul li.settings{
 	background-image: url("../assets/admin/file-settings.png");
 }
+.ribbon-list ul li.back-up-all{
+	background-image: url("../assets/admin/back-up-all.png");
+}
 
 
 /**
@@ -813,12 +816,8 @@ box-shadow: inset 0px 0px 2px 2px #888;
 	background-image: url("../assets/admin/insert_video.png");
 }
 
-/**
-	MASTER
-*/
-
-.ribbon-list ul li.master{
-	background-image: url("../assets/admin/master.png");
+.ribbon-list ul li.container{
+	background-image: url("../assets/admin/add-container.png");
 }
 
 /**

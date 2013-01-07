@@ -1437,6 +1437,8 @@ brix.component.interaction.Draggable = function(rootElement,brixId) {
 	brix.component.ui.DisplayObject.call(this,rootElement,brixId);
 	brix.component.group.Groupable.startGroupable(this);
 	if(this.groupElement == null) this.groupElement = js.Lib.document.body;
+	this.phantom = js.Lib.document.createElement("div");
+	this.miniPhantom = js.Lib.document.createElement("div");
 	this.state = brix.component.interaction.DraggableState.none;
 	this.phantomClassName = rootElement.getAttribute("data-phantom-class-name");
 	if(this.phantomClassName == null || this.phantomClassName == "") this.phantomClassName = "draggable-phantom";
@@ -1461,7 +1463,7 @@ brix.component.interaction.Draggable.prototype = $extend(brix.component.ui.Displ
 		var centerBox1Y = boundingBox1.y + boundingBox1.h / 2.0;
 		return Math.sqrt(Math.pow(centerBox1X - mouseX,2) + Math.pow(centerBox1Y - mouseY,2));
 	}
-	,getBestDropZone: function(mouseX,mouseY) {
+	,createDropZoneArray: function() {
 		var dropZones = new List();
 		var taggedDropZones = this.groupElement.getElementsByClassName(this.dropZonesClassName);
 		var _g1 = 0, _g = taggedDropZones.length;
@@ -1470,13 +1472,10 @@ brix.component.interaction.Draggable.prototype = $extend(brix.component.ui.Displ
 			dropZones.add(taggedDropZones[dzi]);
 		}
 		if(dropZones.isEmpty()) dropZones.add(this.rootElement.parentNode);
-		var nearestDistance = 999999999999;
-		var nearestZone = null;
-		var lastChildIdx = 0;
+		this.dropZoneArray = new Array();
 		var $it0 = dropZones.iterator();
 		while( $it0.hasNext() ) {
 			var zone = $it0.next();
-			var bbZone = brix.util.DomTools.getElementBoundingBox(zone);
 			if(zone.style.display != "none") {
 				var _g1 = 0, _g = zone.childNodes.length;
 				while(_g1 < _g) {
@@ -1484,25 +1483,33 @@ brix.component.interaction.Draggable.prototype = $extend(brix.component.ui.Displ
 					var child = zone.childNodes[childIdx];
 					zone.insertBefore(this.miniPhantom,child);
 					var bbPhantom = brix.util.DomTools.getElementBoundingBox(this.miniPhantom);
-					var dist = this.computeDistance(bbPhantom,mouseX,mouseY);
-					if(dist < nearestDistance) {
-						nearestDistance = dist;
-						nearestZone = zone;
-						lastChildIdx = childIdx;
-					}
+					this.dropZoneArray.push({ parent : zone, position : childIdx, boundingBox : bbPhantom});
 				}
 				zone.appendChild(this.miniPhantom);
 				var bbPhantom = brix.util.DomTools.getElementBoundingBox(this.miniPhantom);
-				var dist = this.computeDistance(bbPhantom,mouseX,mouseY);
-				if(dist < nearestDistance) {
-					nearestDistance = dist;
-					nearestZone = zone;
-					lastChildIdx = zone.childNodes.length + 1;
-				}
+				this.dropZoneArray.push({ parent : zone, position : zone.childNodes.length + 1, boundingBox : bbPhantom});
 				zone.removeChild(this.miniPhantom);
 			}
 		}
-		if(nearestZone != null) return { parent : nearestZone, position : lastChildIdx}; else return null;
+	}
+	,deleteDropZoneArray: function() {
+		this.dropZoneArray = null;
+	}
+	,getBestDropZone: function(mouseX,mouseY) {
+		if(this.dropZoneArray == null) throw "The drop zones must have been computed before you can get the best drop zone. Call Draggable::createDropZoneArray method first.";
+		var nearestDropZone = null;
+		var nearestDistance = 999999999.0;
+		var _g = 0, _g1 = this.dropZoneArray;
+		while(_g < _g1.length) {
+			var dropZone = _g1[_g];
+			++_g;
+			var dist = this.computeDistance(dropZone.boundingBox,mouseX,mouseY);
+			if(dist < nearestDistance) {
+				nearestDistance = dist;
+				nearestDropZone = dropZone;
+			}
+		}
+		return nearestDropZone;
 	}
 	,updateBestDropZone: function() {
 		this.isDirty = false;
@@ -1514,22 +1521,11 @@ brix.component.interaction.Draggable.prototype = $extend(brix.component.ui.Displ
 	,invalidateBestDropZone: function() {
 		if(this.isDirty == false) {
 			this.isDirty = true;
-			haxe.Timer.delay($bind(this,this.updateBestDropZone),50);
+			haxe.Timer.delay($bind(this,this.updateBestDropZone),100);
 		}
 	}
-	,isDirty: null
-	,currentMouseY: null
-	,currentMouseX: null
-	,move: function(e) {
-		this.currentMouseX = e.clientX;
-		this.currentMouseY = e.clientY;
-		brix.util.DomTools.moveTo(this.rootElement,this.currentMouseX - this.initialMouseX,this.currentMouseY - this.initialMouseY);
-		this.invalidateBestDropZone();
-		var event = js.Lib.document.createEvent("CustomEvent");
-		event.initCustomEvent("dragEventMove",true,true,{ dropZone : this.bestDropZone, target : this.rootElement, draggable : this});
-		this.rootElement.dispatchEvent(event);
-	}
 	,stopDrag: function(e) {
+		js.Lib.document.body.removeEventListener("mousemove",this.moveCallback,false);
 		if(this.state == brix.component.interaction.DraggableState.dragging) {
 			if(this.bestDropZone != null) {
 				this.rootElement.parentNode.removeChild(this.rootElement);
@@ -1543,12 +1539,12 @@ brix.component.interaction.Draggable.prototype = $extend(brix.component.ui.Displ
 			this.rootElement.dispatchEvent(event);
 			this.state = brix.component.interaction.DraggableState.none;
 			this.resetRootElementStyle();
-			js.Lib.document.body.removeEventListener("mousemove",this.moveCallback,false);
 			this.setAsBestDropZone(null);
+			this.deleteDropZoneArray();
 			e.preventDefault();
 		}
 	}
-	,startDrag: function(e) {
+	,move: function(e) {
 		if(this.state == brix.component.interaction.DraggableState.none) {
 			var boundingBox = brix.util.DomTools.getElementBoundingBox(this.rootElement);
 			this.state = brix.component.interaction.DraggableState.dragging;
@@ -1556,17 +1552,27 @@ brix.component.interaction.Draggable.prototype = $extend(brix.component.ui.Displ
 			this.initialMouseY = e.clientY - boundingBox.y;
 			this.initRootElementStyle();
 			this.initPhantomStyle();
-			this.moveCallback = (function(f) {
-				return function(e1) {
-					return f(e1);
-				};
-			})($bind(this,this.move));
-			js.Lib.document.body.addEventListener("mousemove",this.moveCallback,false);
 			brix.util.DomTools.moveTo(this.rootElement,boundingBox.x,boundingBox.y);
 			var event = js.Lib.document.createEvent("CustomEvent");
 			event.initCustomEvent("dragEventDrag",true,true,{ dropZone : this.bestDropZone, target : this.rootElement, draggable : this});
 			this.rootElement.dispatchEvent(event);
+			this.createDropZoneArray();
 		}
+		this.currentMouseX = e.clientX;
+		this.currentMouseY = e.clientY;
+		brix.util.DomTools.moveTo(this.rootElement,this.currentMouseX - this.initialMouseX,this.currentMouseY - this.initialMouseY);
+		this.invalidateBestDropZone();
+		var event = js.Lib.document.createEvent("CustomEvent");
+		event.initCustomEvent("dragEventMove",true,true,{ dropZone : this.bestDropZone, target : this.rootElement, draggable : this});
+		this.rootElement.dispatchEvent(event);
+	}
+	,startDrag: function(e) {
+		this.moveCallback = (function(f) {
+			return function(e1) {
+				return f(e1);
+			};
+		})($bind(this,this.move));
+		js.Lib.document.body.addEventListener("mousemove",this.moveCallback,false);
 		e.preventDefault();
 	}
 	,resetRootElementStyle: function() {
@@ -1583,17 +1589,8 @@ brix.component.interaction.Draggable.prototype = $extend(brix.component.ui.Displ
 	}
 	,initPhantomStyle: function(refHtmlDom) {
 		if(refHtmlDom == null) refHtmlDom = this.rootElement;
-		var _g = 0, _g1 = Reflect.fields(refHtmlDom.style);
-		while(_g < _g1.length) {
-			var styleName = _g1[_g];
-			++_g;
-			try {
-				var val = Reflect.field(refHtmlDom.style,styleName);
-				this.phantom[styleName] = val;
-				this.miniPhantom[styleName] = val;
-			} catch( e ) {
-			}
-		}
+		this.phantom.style.cssText = refHtmlDom.style.cssText;
+		this.miniPhantom.style.cssText = refHtmlDom.style.cssText;
 		this.phantom.className = this.phantomClassName;
 		this.miniPhantom.className = this.phantomClassName;
 		this.phantom.className += " " + refHtmlDom.className;
@@ -1626,8 +1623,6 @@ brix.component.interaction.Draggable.prototype = $extend(brix.component.ui.Displ
 	}
 	,init: function() {
 		brix.component.ui.DisplayObject.prototype.init.call(this);
-		this.phantom = js.Lib.document.createElement("div");
-		this.miniPhantom = js.Lib.document.createElement("div");
 		this.dragZone = brix.util.DomTools.getSingleElement(this.rootElement,"draggable-dragzone",false);
 		if(this.dragZone == null) this.dragZone = this.rootElement;
 		this.dragZone.addEventListener("mousedown",$bind(this,this.startDrag),false);
@@ -1639,6 +1634,10 @@ brix.component.interaction.Draggable.prototype = $extend(brix.component.ui.Displ
 		js.Lib.document.body.addEventListener("mouseup",this.mouseUpCallback,false);
 		this.dragZone.style.cursor = "move";
 	}
+	,dropZoneArray: null
+	,isDirty: null
+	,currentMouseY: null
+	,currentMouseX: null
 	,initialMouseY: null
 	,initialMouseX: null
 	,initialStyle: null
@@ -2206,14 +2205,16 @@ brix.component.navigation.ContextManager.prototype = $extend(brix.component.ui.D
 		if(this.hasContext(context)) {
 			HxOverrides.remove(this.currentContexts,context);
 			this.invalidate();
-		} else haxe.Log.trace("Warning: Could not remove the context \"" + context + "\" from the current context, because it is not in the currentContexts array.",{ fileName : "ContextManager.hx", lineNumber : 240, className : "brix.component.navigation.ContextManager", methodName : "removeContext"});
+		} else {
+		}
 	}
 	,addContext: function(context) {
 		if(!this.isContext(context)) throw "Error: unknown context \"" + context + "\". It should be defined in the \"" + "data-context-list" + "\" parameter of the Context component.";
 		if(!this.hasContext(context)) {
 			this.currentContexts.push(context);
 			this.invalidate();
-		} else haxe.Log.trace("Warning: Could not add the context \"" + context + "\" to the current context, because it is allready in the currentContexts array.",{ fileName : "ContextManager.hx", lineNumber : 222, className : "brix.component.navigation.ContextManager", methodName : "addContext"});
+		} else {
+		}
 	}
 	,setCurrentContexts: function(contextList) {
 		this.currentContexts = contextList;
@@ -2223,7 +2224,6 @@ brix.component.navigation.ContextManager.prototype = $extend(brix.component.ui.D
 	,invalidate: function() {
 		this.refresh();
 		this.isDirty = true;
-		haxe.Log.trace("dispatch change",{ fileName : "ContextManager.hx", lineNumber : 189, className : "brix.component.navigation.ContextManager", methodName : "invalidate"});
 		var event = js.Lib.document.createEvent("CustomEvent");
 		event.initCustomEvent("changeContextEvent",false,false,this.currentContexts);
 		this.rootElement.dispatchEvent(event);
@@ -9097,16 +9097,17 @@ silex.ui.stage.DropHandlerBase.prototype = $extend(brix.component.ui.DisplayObje
 					if(modelElement.parentNode == null) throw "Error while moving the element: the element in the model has no parent.";
 					if(modelBeforeElement == null) modelParent.appendChild(modelElement); else modelParent.insertBefore(modelElement,modelBeforeElement);
 				} catch( e1 ) {
-					haxe.Log.trace("ON DROP ERROR: " + Std.string(e1) + "(" + Std.string(element) + " , " + Std.string(beforeElement) + ", " + Std.string(parent) + ")",{ fileName : "DropHandlerBase.hx", lineNumber : 176, className : "silex.ui.stage.DropHandlerBase", methodName : "onDrop"});
+					haxe.Log.trace("ON DROP ERROR: " + Std.string(e1) + "(" + Std.string(element) + " , " + Std.string(beforeElement) + ", " + Std.string(parent) + ")",{ fileName : "DropHandlerBase.hx", lineNumber : 178, className : "silex.ui.stage.DropHandlerBase", methodName : "onDrop"});
 				}
 			} else {
-				haxe.Log.trace("a drop zone was NOT found",{ fileName : "DropHandlerBase.hx", lineNumber : 183, className : "silex.ui.stage.DropHandlerBase", methodName : "onDrop"});
+				haxe.Log.trace("a drop zone was NOT found",{ fileName : "DropHandlerBase.hx", lineNumber : 185, className : "silex.ui.stage.DropHandlerBase", methodName : "onDrop"});
 				if(this.draggedElementParent.childNodes.length > this.draggedElementPosition) this.draggedElementParent.insertBefore(element,this.draggedElementParent.childNodes[this.draggedElementPosition]); else this.draggedElementParent.appendChild(element);
 			}
-		} else haxe.Log.trace("Nothing being dragged",{ fileName : "DropHandlerBase.hx", lineNumber : 196, className : "silex.ui.stage.DropHandlerBase", methodName : "onDrop"});
+		} else haxe.Log.trace("Nothing being dragged",{ fileName : "DropHandlerBase.hx", lineNumber : 198, className : "silex.ui.stage.DropHandlerBase", methodName : "onDrop"});
 		this.resetDraggedMarker();
 	}
 	,onDrag: function(e) {
+		haxe.Log.trace("silex onDrag",{ fileName : "DropHandlerBase.hx", lineNumber : 72, className : "silex.ui.stage.DropHandlerBase", methodName : "onDrag"});
 		var event = e;
 		event.detail.draggable.groupElement = silex.file.FileModel.getInstance().currentData.viewHtmlDom.parentNode;
 		this.setDraggedElement(event.detail);
@@ -9114,7 +9115,8 @@ silex.ui.stage.DropHandlerBase.prototype = $extend(brix.component.ui.DisplayObje
 		if(draggedElement != null) {
 			this.draggedElementParent = draggedElement.parentNode;
 			this.draggedElementPosition = brix.util.DomTools.getElementIndex(draggedElement);
-			event.detail.draggable.initPhantomStyle(draggedElement);
+			var draggable = event.detail.draggable;
+			draggable.initPhantomStyle(draggedElement);
 			this.rootElement.appendChild(draggedElement);
 		}
 	}
@@ -9182,7 +9184,7 @@ silex.ui.stage.InsertDropHandler.prototype = $extend(silex.ui.stage.DropHandlerB
 		return silex.component.ComponentModel.getInstance().addComponent(nodeName,layers.first(),dropZone.position);
 	}
 	,onFileChosen: function(element,fileUrl) {
-		haxe.Log.trace("onFileChosen " + fileUrl,{ fileName : "InsertDropHandler.hx", lineNumber : 211, className : "silex.ui.stage.InsertDropHandler", methodName : "onFileChosen"});
+		haxe.Log.trace("onFileChosen " + fileUrl,{ fileName : "InsertDropHandler.hx", lineNumber : 215, className : "silex.ui.stage.InsertDropHandler", methodName : "onFileChosen"});
 		silex.property.PropertyModel.getInstance().setAttribute(element,"src",silex.file.kcfinder.FileBrowser.getRelativeURLFromFileBrowser(fileUrl));
 	}
 	,initImageComp: function(element) {
@@ -9195,7 +9197,7 @@ silex.ui.stage.InsertDropHandler.prototype = $extend(silex.ui.stage.DropHandlerB
 		silex.file.kcfinder.FileBrowser.selectFile(cbk,this.brixInstanceId,null,"files/assets/");
 	}
 	,onMultipleFilesChosen: function(element,files) {
-		haxe.Log.trace("onMultipleFilesChosen " + Std.string(files),{ fileName : "InsertDropHandler.hx", lineNumber : 181, className : "silex.ui.stage.InsertDropHandler", methodName : "onMultipleFilesChosen"});
+		haxe.Log.trace("onMultipleFilesChosen " + Std.string(files),{ fileName : "InsertDropHandler.hx", lineNumber : 185, className : "silex.ui.stage.InsertDropHandler", methodName : "onMultipleFilesChosen"});
 		silex.property.PropertyModel.getInstance().setAttribute(element,"controls","controls");
 		var modelHtmlDom = silex.file.FileModel.getInstance().getModelFromView(element);
 		var _g = 0;
@@ -9229,7 +9231,7 @@ silex.ui.stage.InsertDropHandler.prototype = $extend(silex.ui.stage.DropHandlerB
 				var nodes = brix.component.navigation.Layer.getLayerNodes(silex.page.PageModel.getInstance().selectedItem.name,silex.file.FileModel.getInstance().application.id,silex.file.FileModel.getInstance().currentData.viewHtmlDom);
 				if(nodes.length > 0) defaultContainer = nodes[0];
 			}
-			if(defaultContainer != null) dropZone = { position : 0, parent : defaultContainer};
+			if(defaultContainer != null) dropZone = { position : 0, parent : defaultContainer, boundingBox : null};
 		}
 		var element;
 		if(dropZone != null) {
@@ -9265,7 +9267,7 @@ silex.ui.stage.InsertDropHandler.prototype = $extend(silex.ui.stage.DropHandlerB
 				element = this.addLayer(dropZone,silex.page.PageModel.getInstance().selectedItem).rootElement;
 				silex.property.PropertyModel.getInstance().setAttribute(element,"data-silex-name","New container");
 			} else throw "unknown element has been drop on stage from the insert menu";
-		} else haxe.Log.trace("onDrop - a drop zone was NOT found",{ fileName : "InsertDropHandler.hx", lineNumber : 163, className : "silex.ui.stage.InsertDropHandler", methodName : "onDrop"});
+		} else haxe.Log.trace("onDrop - a drop zone was NOT found",{ fileName : "InsertDropHandler.hx", lineNumber : 167, className : "silex.ui.stage.InsertDropHandler", methodName : "onDrop"});
 	}
 	,resetDraggedMarker: function() {
 		this.listElementClone.parentNode.removeChild(this.listElementClone);
@@ -9276,6 +9278,8 @@ silex.ui.stage.InsertDropHandler.prototype = $extend(silex.ui.stage.DropHandlerB
 		silex.ui.stage.DropHandlerBase.prototype.onDrag.call(this,e);
 		var event = e;
 		event.detail.draggable.groupElement = silex.file.FileModel.getInstance().currentData.viewHtmlDom.parentNode;
+		var draggable = event.detail.draggable;
+		draggable.phantom.style.position = "relative";
 	}
 	,getDraggedElement: function(draggableEvent) {
 		return null;
@@ -10660,6 +10664,7 @@ brix.component.interaction.Draggable.DEFAULT_CSS_CLASS_DROPZONE = "draggable-dro
 brix.component.interaction.Draggable.DEFAULT_CSS_CLASS_PHANTOM = "draggable-phantom";
 brix.component.interaction.Draggable.ATTR_PHANTOM = "data-phantom-class-name";
 brix.component.interaction.Draggable.ATTR_DROPZONE = "data-dropzones-class-name";
+brix.component.interaction.Draggable.DELAY_BETWEEN_DROP_ZONE_CHECKS = 100;
 brix.component.interaction.Draggable.EVENT_DRAG = "dragEventDrag";
 brix.component.interaction.Draggable.EVENT_DROPPED = "dragEventDropped";
 brix.component.interaction.Draggable.EVENT_MOVE = "dragEventMove";

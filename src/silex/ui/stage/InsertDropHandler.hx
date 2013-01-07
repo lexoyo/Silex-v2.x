@@ -84,6 +84,9 @@ class InsertDropHandler extends DropHandlerBase{
 		super.onDrag(e);
 		var event:CustomEvent = cast(e);
 		event.detail.draggable.groupElement = FileModel.getInstance().currentData.viewHtmlDom.parentNode;
+
+		var draggable:Draggable = event.detail.draggable;
+		draggable.phantom.style.position="relative";
 	}
 	/**
 	 * reset dragged element
@@ -123,7 +126,8 @@ class InsertDropHandler extends DropHandlerBase{
 			if (defaultContainer != null){
 				dropZone = {
 					position : 0,
-					parent : defaultContainer
+					parent : defaultContainer,
+					boundingBox: null
 				};
 			}
 		}

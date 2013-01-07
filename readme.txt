@@ -39,23 +39,39 @@ To read the license please visit http://www.gnu.org/copyleft/gpl.html
 ** to do **
 
 en cours
+* new drag/drop system (brix)
+  - mouse down => parcours le dom avec le mini phantom, crée une liste de dropZone (parent, index, bounding box)
+  - mouse move => parcours la liste de dropZone et det la plus proche
+  - mouse up => détruit la liste
+
+* display none => no drop?
 * remplacer silex-view par silex-body
 * cleanup Silex.hx : package core et split selon les options de config
+
+remarques pol
+* selection du container quand on va droper dedans
+* tool tip sur btn edit des container, videos
+* indiquer qu'il faut un oog et un mp3 pour ff et chrome?
+* insert : si pas de calque selectionné, alert
+* metrix au lieu de box model
+* burdures et background au lieuy de box design
+* click sur color picker décoche "transparent"
+
+
+* search box for styles in the toolbox?
+
+
 
 * erreurs dans filemodel => pas de display correct
 * ouvrir un fichier existant sur le serveur bug
 * pas besoin de silex-builder.js dans drobox
 * cleanup package ui (several single classes at root : script, SilexContextManager ...)
 
-refactoring BRIX
-* suggerer compil cond dans le html?
-* enums for event.detail
-* no more static methods like openPage, use specialized version of Page and dispatch events
-  - Page
-  - notification
-* navigation
-  * declare Pages and NavigationGroups in the headers? use it for sitemap / seo with history api
-  * take history api out of the pages
+* refactoring page/layer/context http://www.silexlabs.org/groups/brix/contributors/forum/topic/the-future-of-page-layer-and-context/
+
+
+- enums for event.detail
+
 * templates http://www.silexlabs.org/groups/brix/contributors/forum/topic/haxe-templates/
 * layouts and redraw : have a queue of redraws? redraw children first?
 * replace getElementsByClassName by Application.getComponents
@@ -64,7 +80,10 @@ refactoring BRIX
 
 bugs
 * image without URL is too small and not visible
-
+* https://github.com/silexlabs/Silex-v2.x/issues/49 
+* https://github.com/silexlabs/Silex-v2.x/issues/40
+* https://github.com/silexlabs/Silex-v2.x/issues/53
+* tout en float => pas moyen de mettre en dessous
 
 ergo
 * https://github.com/silexlabs/Silex-v2.x/issues/36
@@ -72,6 +91,9 @@ ergo
 * https://github.com/silexlabs/Silex-v2.x/issues/38
 * https://github.com/silexlabs/Silex-v2.x/issues/43
 * https://github.com/silexlabs/Silex-v2.x/issues/45
+* https://github.com/silexlabs/Silex-v2.x/issues/48
+* https://github.com/silexlabs/Silex-v2.x/issues/51
+ 
 
 silex to do
 * remove all dropbox related (.htaccess...)
