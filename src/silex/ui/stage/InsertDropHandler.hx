@@ -86,7 +86,7 @@ class InsertDropHandler extends DropHandlerBase{
 		event.detail.draggable.groupElement = FileModel.getInstance().currentData.viewHtmlDom.parentNode;
 
 		var draggable:Draggable = event.detail.draggable;
-		draggable.phantom.style.position="static";
+		draggable.phantom.style.position="relative";
 	}
 	/**
 	 * reset dragged element
@@ -106,9 +106,6 @@ class InsertDropHandler extends DropHandlerBase{
 		// retrieve a reference to the component or layer
 		var event:CustomEvent = cast(e);
 		var dropZone:DropZone = event.detail.dropZone;
-
-		var draggable:Draggable = event.detail.draggable;
-		draggable.phantom.style.position=null;
 
 		super.onDrop(e);
 
