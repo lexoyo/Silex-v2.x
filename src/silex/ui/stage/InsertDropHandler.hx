@@ -86,7 +86,7 @@ class InsertDropHandler extends DropHandlerBase{
 		event.detail.draggable.groupElement = FileModel.getInstance().currentData.viewHtmlDom.parentNode;
 
 		var draggable:Draggable = event.detail.draggable;
-		draggable.phantom.style.position="relative";
+		draggable.phantom.style.position="static";
 	}
 	/**
 	 * reset dragged element
@@ -108,6 +108,11 @@ class InsertDropHandler extends DropHandlerBase{
 		var dropZone:DropZone = event.detail.dropZone;
 
 		super.onDrop(e);
+
+		// reset root element css styles
+		rootElement.style.position=null;
+		rootElement.style.top=null;
+		rootElement.style.left=null;
 
 		// if no drop zone, then drop in the selected layer or 1st layer
 		if (dropZone == null 
