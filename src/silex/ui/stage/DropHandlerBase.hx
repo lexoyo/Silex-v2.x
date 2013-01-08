@@ -19,6 +19,14 @@ import silex.component.ComponentModel;
 @tagNameFilter("DIV")
 class DropHandlerBase extends DisplayObject{
 	/**
+	 * class name set on the container in wich the dragged element is about to be dropped
+	 */
+	static public inline var CURRENT_DROP_CONTAINER_CLASS_NAME="current-drop-container";
+	/**
+	 * container in wich the dragged element is about to be dropped
+	 */
+	private var currentDropContainer:HtmlDom;
+	/**
 	 * marker initial parent in the DOM
 	 */
 	private var initialMarkerParent:HtmlDom;
@@ -94,6 +102,11 @@ class DropHandlerBase extends DisplayObject{
 	 * Handle Draggable events
 	 */
 	public function onMove(e:Event) {
+		if (currentDropContainer != null){
+			DomTools.removeClass(currentDropContainer, CURRENT_DROP_CONTAINER_CLASS_NAME);
+			currentDropContainer = null;
+		}
+
 		var event:CustomEvent = cast(e);
 
 		// the drop zone passed with the event 
@@ -104,8 +117,10 @@ class DropHandlerBase extends DisplayObject{
 			var layerClasses = FileModel.getInstance().application.getAssociatedComponents(dropZone.parent, Layer);
 			if (layerClasses.length == 1){
 				// case of a component dropped in a layer, prevent unselect component
-				LayerModel.getInstance().setSelectedItemNoEvent(layerClasses.first());
+//				LayerModel.getInstance().setSelectedItemNoEvent(layerClasses.first());
 				//LayerModel.getInstance().refresh();
+				DomTools.addClass(dropZone.parent, CURRENT_DROP_CONTAINER_CLASS_NAME);
+				currentDropContainer = dropZone.parent;
 			}
 		}
 	}
@@ -113,6 +128,10 @@ class DropHandlerBase extends DisplayObject{
 	 * Handle Draggable events
 	 */
 	public function onDrop(e:Event) {
+		if (currentDropContainer != null){
+			DomTools.removeClass(currentDropContainer, CURRENT_DROP_CONTAINER_CLASS_NAME);
+			currentDropContainer = null;
+		}
 
 		var event:CustomEvent = cast(e);
 

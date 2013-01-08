@@ -549,6 +549,11 @@ box-shadow: inset 0px 0px 2px 2px #888;
 -webkit-box-shadow: inset 0px 0px 2px 2px #888;
 box-shadow: inset 0px 0px 2px 2px #888;
 }
+.current-drop-container{
+-moz-box-shadow: inset 0px 0px 2px 2px #888;
+-webkit-box-shadow: inset 0px 0px 2px 2px #888;
+box-shadow: inset 0px 0px 2px 2px #888;
+}
 .selection-phantom{
 	background-color: rgba(80, 80, 80, 0.25);
 }

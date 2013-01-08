@@ -36,7 +36,7 @@ class PropertyEditor extends UrlEditor
 		super(rootElement, BrixId);
 	}
 	override private function onPropertyChange(e:CustomEvent) {
-		trace("onPropertyChange "+propertyChangePending+" - "+e.detail.name+" - "+propertyName);
+		// trace("onPropertyChange "+propertyChangePending+" - "+e.detail.name+" - "+propertyName);
 		if (propertyChangePending)
 			return;
 		refresh();
@@ -93,7 +93,7 @@ class PropertyEditor extends UrlEditor
 	 * reset the values
 	 */
 	override private function reset() {
-		trace("reset");
+		// trace("reset");
 		// 
 		// font family
 		setInputValue("name-property", "");
@@ -110,7 +110,7 @@ class PropertyEditor extends UrlEditor
 	 * display the property value
 	 */
 	override private function load(element:HtmlDom) {
-		trace("load");
+		// trace("load");
 
 		var propertyModel = PropertyModel.getInstance();
 
@@ -189,7 +189,7 @@ class PropertyEditor extends UrlEditor
 			// otherwise it may be on a node of type audio or video, which has no src attribute
 			propertyModel.setProperty(selectedItem, "src", "");
 		}
-		trace("apply "+DomTools.abs2rel(value));
+		// trace("apply "+DomTools.abs2rel(value));
 
 		var modelHtmlDom = FileModel.getInstance().getModelFromView(selectedItem);
 		var sources = modelHtmlDom.getElementsByTagName("source");
