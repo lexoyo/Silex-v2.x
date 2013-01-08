@@ -67,13 +67,13 @@ class FileBrowser
 	 * download a folder
 	 */
 	public static function downloadFolder(path:String = ""){
-		openPageWithPostData("../libs/kcfinder/browse.php?type=files&lng=en&act=downloadDir", path);
+		openPageWithPostData("downloadDir", path);
 	}
 	/**
 	 * download a file 
 	 */
 	public static function downloadFile(fileUrl:String){
-		openPageWithPostData("../libs/kcfinder/browse.php?type=files&lng=en&act=download", fileUrl);
+		openPageWithPostData("download", fileUrl);
 	}
 	/**
 	 * open a new window and pass post data 
@@ -82,7 +82,7 @@ class FileBrowser
 		var form = Lib.document.createElement("form");
 		form.setAttribute("target", "_blank");
 		form.setAttribute("method", "post");
-		form.setAttribute("action", "../libs/kcfinder/browse.php?type=files&lng=en&act="+data);
+		form.setAttribute("action", "../libs/kcfinder/browse.php?type=files&lng=en&act="+url);
 		
 		var hiddenField = Lib.document.createElement("input");
 		hiddenField.setAttribute("type", "hidden");
