@@ -64,6 +64,39 @@ class FileBrowser
 		selectFile(null, brixInstanceId, msg, path);
 	}
 	/**
+	 * download a folder
+	 */
+	public static function downloadFolder(path:String = ""){
+		openPageWithPostData("../libs/kcfinder/browse.php?type=files&lng=en&act=downloadDir", path);
+	}
+	/**
+	 * download a file 
+	 */
+	public static function downloadFile(fileUrl:String){
+		openPageWithPostData("../libs/kcfinder/browse.php?type=files&lng=en&act=download", fileUrl);
+	}
+	/**
+	 * open a new window and pass post data 
+	 */
+	public static function openPageWithPostData(url:String, data:String){
+		var form = Lib.document.createElement("form");
+		form.setAttribute("target", "_blank");
+		form.setAttribute("method", "post");
+		form.setAttribute("action", "../libs/kcfinder/browse.php?type=files&lng=en&act="+data);
+		
+		var hiddenField = Lib.document.createElement("input");
+		hiddenField.setAttribute("type", "hidden");
+		hiddenField.setAttribute("name", "dir");
+		hiddenField.setAttribute("value", "../../files/"+data);
+		form.appendChild(hiddenField);
+
+		Lib.document.body.appendChild(form);
+		cast(form).submit();
+
+		Lib.document.body.removeChild(form);
+		form.removeChild(hiddenField);
+	}
+	/**
 	 * open file browser
 	 * called when the user clicks on a button with "select-file-button" class
 	 */

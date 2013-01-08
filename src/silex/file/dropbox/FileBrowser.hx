@@ -50,6 +50,18 @@ class FileBrowser // extends DialogBase
 		Lib.window.open("https://www.dropbox.com/home/Apps/Silex/"+path);
 	}
 	/**
+	 * download a folder
+	 */
+	public static function downloadFolder(path:String = ""){
+		Lib.window.open("https://www.dropbox.com/home/Apps/Silex/"+path);
+	}
+	/**
+	 * download a file 
+	 */
+	public static function downloadFile(fileUrl:String){
+		Lib.window.open("https://www.dropbox.com/home/Apps/Silex/"+fileUrl);
+	}
+	/**
 	 * open file browser
 	 * called when the user clicks on a button with "select-file-button" class
 	 */

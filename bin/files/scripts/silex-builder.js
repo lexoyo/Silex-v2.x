@@ -6087,15 +6087,15 @@ hscript.Interp.prototype = {
 			case 0:
 				var v = $e[2];
 				return v;
-			case 3:
-				var v = $e[2];
-				return v;
 			case 1:
 				var f = $e[2];
 				return f;
 			case 2:
 				var s = $e[2];
 				return s;
+			case 3:
+				var v = $e[2];
+				return v;
 			}
 			break;
 		case 1:
@@ -6652,10 +6652,6 @@ hscript.Parser.prototype = {
 				var v = $e[2];
 				$r = Std.string(v);
 				break;
-			case 3:
-				var v = $e[2];
-				$r = Std.string(v);
-				break;
 			case 1:
 				var f = $e[2];
 				$r = Std.string(f);
@@ -6663,6 +6659,10 @@ hscript.Parser.prototype = {
 			case 2:
 				var s = $e[2];
 				$r = s;
+				break;
+			case 3:
+				var v = $e[2];
+				$r = Std.string(v);
 				break;
 			}
 			return $r;
@@ -8323,6 +8323,28 @@ silex.file.kcfinder.FileBrowser.manageFiles = function(brixInstanceId,msg,path) 
 	if(path == null) path = "./";
 	silex.file.kcfinder.FileBrowser.selectFile(null,brixInstanceId,msg,path);
 }
+silex.file.kcfinder.FileBrowser.downloadFolder = function(path) {
+	if(path == null) path = "";
+	silex.file.kcfinder.FileBrowser.openPageWithPostData("../libs/kcfinder/browse.php?type=files&lng=en&act=downloadDir",path);
+}
+silex.file.kcfinder.FileBrowser.downloadFile = function(fileUrl) {
+	silex.file.kcfinder.FileBrowser.openPageWithPostData("../libs/kcfinder/browse.php?type=files&lng=en&act=download",fileUrl);
+}
+silex.file.kcfinder.FileBrowser.openPageWithPostData = function(url,data) {
+	var form = js.Lib.document.createElement("form");
+	form.setAttribute("target","_blank");
+	form.setAttribute("method","post");
+	form.setAttribute("action","../libs/kcfinder/browse.php?type=files&lng=en&act=" + data);
+	var hiddenField = js.Lib.document.createElement("input");
+	hiddenField.setAttribute("type","hidden");
+	hiddenField.setAttribute("name","dir");
+	hiddenField.setAttribute("value","../../files/" + data);
+	form.appendChild(hiddenField);
+	js.Lib.document.body.appendChild(form);
+	form.submit();
+	js.Lib.document.body.removeChild(form);
+	form.removeChild(hiddenField);
+}
 silex.file.kcfinder.FileBrowser.selectMultipleFiles = function(userCallback,brixInstanceId,msg,path) {
 	if(path == null) path = "files/";
 	if(msg == null) msg = "Double click to select one or more files!";
@@ -9716,6 +9738,9 @@ silex.ui.toolbox.MenuController.renamePage = function() {
 silex.ui.toolbox.MenuController.openFileBrowser = function() {
 	silex.file.kcfinder.FileBrowser.manageFiles(silex.ui.toolbox.MenuController.menuBrixId,"Manage your files and click \"close\"");
 }
+silex.ui.toolbox.MenuController.bkpAllFileBrowser = function() {
+	silex.file.kcfinder.FileBrowser.downloadFolder();
+}
 silex.ui.toolbox.MenuController.__super__ = brix.component.ui.DisplayObject;
 silex.ui.toolbox.MenuController.prototype = $extend(brix.component.ui.DisplayObject.prototype,{
 	onClick: function(e) {
@@ -9756,6 +9781,9 @@ silex.ui.toolbox.MenuController.prototype = $extend(brix.component.ui.DisplayObj
 			break;
 		case "open-file-browser":
 			silex.ui.toolbox.MenuController.openFileBrowser();
+			break;
+		case "back-up-all":
+			silex.ui.toolbox.MenuController.bkpAllFileBrowser();
 			break;
 		}
 	}

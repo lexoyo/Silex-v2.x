@@ -119,6 +119,12 @@ class MenuController extends DisplayObject
 		FileBrowser.manageFiles(menuBrixId, "Manage your files and click \"close\"");
 	}
 	/**
+	 * back up the hole file directory
+	 */
+	static public function bkpAllFileBrowser(){
+		FileBrowser.downloadFolder();
+	}
+	/**
 	 * Constructor
 	 * Start listening the node
 	 */
@@ -188,6 +194,8 @@ class MenuController extends DisplayObject
 			/////////////
 			case "open-file-browser":
 				openFileBrowser();
+			case "back-up-all":
+				bkpAllFileBrowser();
 		}
 	}
 }
